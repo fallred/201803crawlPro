@@ -33,15 +33,29 @@
 D:\mysql-5.7.21-winx64\bin> 
  bin目录下执行 .\mysqld install MySQL --defaults-file="E:\Program Files\mysql-8.0.15-winx64\my.ini"
 
- bin目录下执行   net start mysql
+ bin目录下执行，启动mysql   net start mysql
 
  mysql -u root -p
+ 
+bin目录下，启动mysql   net start mysql 后执行命令
+// 修改密码
+ALTER USER 'root'@localhost IDENTIFIED WITH mysql_native_password BY '123456';
+
+FLUSH PRIVILEGES;
 
  navicate for mysql 安装，
  下载https://www.navicat.com.cn/download/direct-download?product=navicat_mysql_cs_x64.exe&location=1
  激活https://www.jianshu.com/p/42a33b0dda9c
 
 
- GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY "123456"; 
- FLUSH PRIVILEGES;
+
+// mysql 
+// bluebird 将mysql转化成promise
+
+
+cmd命令框
+SET DEBUG=juejin:*
+node main.js
+
+
 
