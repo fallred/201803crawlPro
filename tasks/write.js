@@ -37,13 +37,14 @@ async function saveArticles(articles) {
         let tags = article.tags;//['前端','数据库']
         let whereClause = `('` + tags.join(`','`) + `')`;//('前端','数据库')
         // [{id:1},{id:2}]
-        let tagIds = await query(`SELECT id FROM tags WHERE name in ${whereClause}`);
-        for (let i = 0; i < tagIds.length; i++) {
-            await query(`INSERT INTO article_tag(article_id,tag_id) VALUES(?,?)`, [article.id, tagIds[i].id]);
+        let tagIdObj = await query(`SELECT id FROM tags WHERE name in ${whereClause}`);
+        for (let i = 0; i < tagIdObj.length; i++) {
+            await query(`INSERT INTO article_tag(article_id,tag_id) VALUES(?,?)`, [article.id, tagIdObj[i].id]);
         }
-        if (tagIds.length >0) {
-            let tagIdWhere = tagIds.join(',');
-            let emailArray = await query(`select DISTINCT email from user_tag ut INNER JOIN users WHERE tag_id IN (${tagIdWhere})`);
+        let tagIdsString = tagIdObj.map(item=>item.id).join(',');// 1,2
+        if (tagIdObj.length >0) {
+            // let tagIdWhere = tagIds.join(',');
+            let emailArray = await query(`SELECT distinct email from user_tag ut INNER JOIN users WHERE tag_id IN (${tagIdsString})`);
             let emails = emailArray.map(item => item.email);
             for (let i =0;i<emails.length;i++) {
                 logger(`开始向${emails[i]}发邮件：${article.title}`);

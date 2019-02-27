@@ -20,7 +20,7 @@ let tagsUrl = 'https://juejin.im/subscribe/all';
         });
     }
     await write.saveArticles(Object.values(allArticles));
-    await sendMail('741953435@qq.com', '我在淘宝做前端的这三年 — 第一年', 'http://localhost:8080/detail/5c74d4b9e51d4512c37ea03b');
+    // await sendMail('741953435@qq.com', '我在淘宝做前端的这三年 — 第一年', 'http://localhost:8080/detail/5c74d4b9e51d4512c37ea03b');
 })().then(ret => {
     logger('全部任务执行完毕，进程退出');
     process.exit(0);
