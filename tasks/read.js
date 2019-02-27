@@ -36,7 +36,7 @@ async function articles(url) {
     let $ = cheerio.load(html);
     let list = $('.info-row.title-row > a.title');
     let articles = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         let _this = $(list[i]);
         let href = `https://juejin.im${_this.attr('href')}`;//取得超链接 /post/5b7652106fb9a009ac5589f2
         let lastSlashIndex = href.lastIndexOf('/');

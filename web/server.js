@@ -4,6 +4,18 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const { query }= require('../mysql');
 const app = express();
+function common(req, res, next){
+    // res.locals 是约定一个变量，它会默认用来渲染模版
+    res.locals.user = req.session.user;
+    next();
+}
+function mustLogin(req, res, next){
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -12,10 +24,11 @@ app.use(session({
     secret: 'zfpx',
     saveUninitialized: true
 }));
+app.use(common);
 app.set('view engine', 'html');
 app.set('views', path.resolve(__dirname, 'views'));
 app.engine('html', require('ejs').__express);
-app.get('/', async function (req, res) {
+app.get('/', mustLogin, async function (req, res) {
     let { tagId } = req.query;
     let tags = await query(`SELECT * FROM tags`);
     if (!tagId) {
@@ -25,7 +38,7 @@ app.get('/', async function (req, res) {
     res.render('index', { title: '主页', tags, articles });
 });
 
-app.get('/detail/:id', async function(req, res){
+app.get('/detail/:id', mustLogin, async function(req, res){
     let id = req.params.id;
     let articles = await query(`SELECT * FROM articles WHERE id=?`, [id]);
     res.render('detail', {
@@ -54,7 +67,7 @@ app.post('/login', async function(req, res){
     }
 });
 
-app.get('/subscribe', async function(req,res){
+app.get('/subscribe', mustLogin, async function(req,res){
     let tags = await query(`SELECT * FROM tags`);
     let user = req.session.user;
     let selectedTags = await query(`SELECT tag_id from user_tag WHERE user_id=?`,[user.id]);
@@ -68,7 +81,7 @@ app.get('/subscribe', async function(req,res){
     });
 });
 
-app.post('/subscribe', async function(req,res){
+app.post('/subscribe', mustLogin, async function(req,res){
     let { tags } = req.body;//[ '1', '2', '9' ] }
     let user = req.session.user;//{id,name}
     await query(`DELETE FROM user_tag WHERE user_id=?`, [user.id]);
@@ -86,3 +99,14 @@ app.listen(8080);
  * 3.搜索
  * 4.部署上线
  */
+
+ let CronJob = require('cron').CronJob;
+ let { spawn } = require('child_process');
+ // ..../node ../tasks/main.js
+ // 每个一个小时起一个子进程，更新任务
+ let job = new CronJob("0 0 * * * *", function(){
+    let child = spawn(process.execPath, [path.resolve(__dirname, '../tasks/main.js')]);
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+ });
+ job.start();

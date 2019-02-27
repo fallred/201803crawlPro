@@ -1,5 +1,6 @@
 let { query } = require('../mysql');
 let logger = require('debug')('juejin:write');
+let sendMail = require('../mail');
 //保存标签的数组
 async function saveTags(tags) {
     logger('开始保存所有的标签');
@@ -39,6 +40,15 @@ async function saveArticles(articles) {
         let tagIds = await query(`SELECT id FROM tags WHERE name in ${whereClause}`);
         for (let i = 0; i < tagIds.length; i++) {
             await query(`INSERT INTO article_tag(article_id,tag_id) VALUES(?,?)`, [article.id, tagIds[i].id]);
+        }
+        if (tagIds.length >0) {
+            let tagIdWhere = tagIds.join(',');
+            let emailArray = await query(`select DISTINCT email from user_tag ut INNER JOIN users WHERE tag_id IN (${tagIdWhere})`);
+            let emails = emailArray.map(item => item.email);
+            for (let i =0;i<emails.length;i++) {
+                logger(`开始向${emails[i]}发邮件：${article.title}`);
+                await sendMail(emails[i], article.title, article.href);
+            }
         }
     }
 }
