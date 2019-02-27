@@ -32,7 +32,7 @@ async function saveArticles(articles){
         let oldArticles = await query(`SELECT 1 FROM articles WHERE id=?`, [article.id]);
         if (Array.isArray(oldArticles) && oldArticles.length > 0){
             logger('开始更新文章：'+ article.title);
-            await query(`UPDAE articles SET title=?,content=?,href=? WHERE id=?`, [article.title, article.content,article.href,article.id]);
+            await query(`UPDATE articles SET title=?,content=?,href=? WHERE id=?`, [article.title, article.content,article.href,article.id]);
         } else {
             logger('开始插入文章：'+ article.title);
             await query(`INSERT INTO articles(id,title,content,href) VALUES(?,?,?,?)`, [article.id, article.titile, article.content, article.href]);
@@ -41,7 +41,7 @@ async function saveArticles(articles){
         await query(`DELETE FROM article_tag WHERE article_id=?`, [article.id]);
         // 第一步要查找标签名称对应的ID，第二步把标签ID和文章ID关联保存到article_tag表里
         // SELECT id FROM tags WHERE name in ('前端','数据库');
-        let tags = articles.tags;
+        let tags = article.tags;
         let whereClause = `('` + tags.join(`','`) + `')`;
         let tagIds = await query(`SELECT id FROM tags WHERE name in ${whereClause}`); 
         for (let i = 0;i<tagIds.length;i++) {

@@ -41,6 +41,12 @@ bin目录下，启动mysql   net start mysql 后执行命令
 // 修改密码
 ALTER USER 'root'@localhost IDENTIFIED WITH mysql_native_password BY '123456';
 
+// 更改数据库编码
+ALTER DATABASE juejin CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+// 更改表编码
+ALTER TABLE `articles` CHARACTER SET = utf8 , COLLATE = utf8_general_ci ;
+
+
 FLUSH PRIVILEGES;
 
  navicate for mysql 安装，

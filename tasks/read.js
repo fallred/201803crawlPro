@@ -43,7 +43,7 @@ async function articles (url) {
     // console.log(list.length);
     let articles = [];
     // list.each(async function(index, item){
-        for(let i = 0; i < list.length; i++){
+        for(let i = 0; i < 2; i++){
             let _this = $(list[i]);
             // 取得超链接  /post/5c6e71acf265da2dda694b27
             let href= `https://juejin.im${_this.attr('href')}`;
@@ -73,13 +73,11 @@ async function readArticle(id, href){
     // 必须加await
     let html = await request(href);
     let $ = cheerio.load(html);
-    let content = $('.article-content').first().html();
-    if (content) {
-        content = content.replace(/&#x(\w+?);/g, function(matched, point){
-            // 转化为中文
+    let content = $('.article-content').first().html() || '';
+    if (content)
+        content = content.replace(/&#x(\w+?);/g, function (matched, point) {
             return String.fromCodePoint(`0x${point}`);
         });
-    }
     let tagTitles = $('.tag-title');
     let tags = [];
     tagTitles.each(function (index, item) {
